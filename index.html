@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IronTrack</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #111;
+    color: white;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    background: #1c1c1c;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.tab {
+    color: white;
+    cursor: pointer;
+}
+
+.container {
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+input, button {
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    background: #00c853;
+    color: white;
+    font-weight: bold;
+}
+
+canvas {
+    margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>IronTrack 💪</header>
+
+<div class="container" id="content">
+    <h2>💧 Wasser Tracker</h2>
+    <p id="waterDisplay">0 ml / 4000 ml</p>
+    <input type="number" id="waterInput" placeholder="ml eingeben">
+    <button onclick="addWater()">Hinzufügen</button>
+    <canvas id="waterChart"></canvas>
+</div>
+
+<div class="tabs">
+    <div class="tab" onclick="showTab('water')">Wasser</div>
+    <div class="tab" onclick="showTab('nutrition')">Ernährung</div>
+    <div class="tab" onclick="showTab('history')">Historie</div>
+    <div class="tab" onclick="showTab('workout')">Training</div>
+    <div class="tab" onclick="showTab('settings')">Einstellungen</div>
+</div>
+
+<script>
+let waterGoal = 4000;
+let waterTotal = localStorage.getItem("waterTotal") ? parseInt(localStorage.getItem("waterTotal")) : 0;
+
+function addWater() {
+    let input = document.getElementById("waterInput");
+    let value = parseInt(input.value);
+    if (!value) return;
+
+    waterTotal += value;
+    localStorage.setItem("waterTotal", waterTotal);
+    input.value = "";
+    updateWater();
+}
+
+function updateWater() {
+    document.getElementById("waterDisplay").innerText = waterTotal + " ml / " + waterGoal + " ml";
+    waterChart.data.datasets[0].data = [waterTotal, waterGoal - waterTotal];
+    waterChart.update();
+}
+
+function showTab(tab) {
+    document.getElementById("content").innerHTML = "<h2>" + tab + " Tab kommt als nächstes 🔥</h2>";
+}
+
+const ctx = document.getElementById('waterChart').getContext('2d');
+const waterChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Getrunken', 'Rest'],
+        datasets: [{
+            data: [waterTotal, waterGoal - waterTotal],
+            backgroundColor: ['#00c853', '#333']
+        }]
+    }
+});
+
+updateWater();
+</script>
+
+</body>
+</html>
